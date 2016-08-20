@@ -1,6 +1,7 @@
 from flask import abort, Flask, g, render_template, request
 from flask_babel import Babel
 from flask_security import current_user
+from flask_security.decorators import login_required
 from radman.utils import get_instance_folder_path
 from radman.main.controllers import main
 from radman.admin.controllers import admin
@@ -15,7 +16,8 @@ app = Flask(__name__,
 
 babel = Babel(app)
 configure_app(app)
-cache.init_app(app)
+# Not needed
+#cache.init_app(app)
 db.init_app(app)
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
@@ -69,7 +71,7 @@ def inject_data():
 
 @app.route('/')
 @app.route('/<lang_code>/')
-@cache.cached(300)
+@login_required
 def home(lang_code=None):
     return render_template('index.htm')
 

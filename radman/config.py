@@ -27,7 +27,7 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///C:/Temp/radman.sqlite'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///instance/radman.sqlite'
     SECRET_KEY = 'a9eec0e0-23b7-4788-9a92-318347b9a39f'
 
 

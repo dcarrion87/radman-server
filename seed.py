@@ -1,10 +1,24 @@
 from radman import app
-from radman.data.models import db, Study, Series
+from radman.data.models import db, Study, Series, Instance
 from flask_security.utils import encrypt_password
+import datetime
+
 
 def create_roles(data_store):
     data_store.create_role(name='admin')
     data_store.commit()
+
+
+def create_study_series_instance(db):
+    study1 = Study('1111.2222.3333',datetime.datetime.now())
+    series1 = Series('1111.2222.3333.4444',study1)
+    instance1 = Instance('1111.2222.3333.4444.5555','1.2.3.4',1)
+
+    db.session.add(study1)
+    db.session.add(series1)
+    db.session.add(instance1)
+    db.session.commit()
+
 
 def create_users(data_store):
     users = [('admin@test.com', 'admin', 'Password1', ['admin'], True)]
@@ -29,3 +43,4 @@ with app.app_context():
     db.create_all()
     create_roles(data_store)
     create_users(data_store)
+    create_study_series_instance(db)

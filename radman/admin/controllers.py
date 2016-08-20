@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash
 from flask import current_app, redirect, request, url_for
-from flask_security.decorators import roles_required
+from flask_security.decorators import roles_required,login_required
 from radman.admin.forms.author_forms import CreateAuthorForm
 from radman.cache import cache
 from radman.data.models import Study, db
@@ -10,11 +10,13 @@ from sqlalchemy import exc
 admin = Blueprint('admin', __name__, template_folder='templates')
 
 @admin.route('/')
+@login_required
 @roles_required('admin')
 def index():
     return render_template('admin_index.htm')
 
 @admin.route('/author/create', methods=['GET', 'POST'])
+@login_required
 @roles_required('admin')
 def create_author():
     form = CreateAuthorForm(request.form)
