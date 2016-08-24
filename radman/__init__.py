@@ -4,7 +4,7 @@ from flask_security import current_user
 from flask_security.decorators import login_required
 from radman.utils import get_instance_folder_path
 from radman.main.controllers import main
-from radman.admin.controllers import admin
+from radman.api.controllers import api_bp
 from radman.cache import cache
 from radman.config import configure_app
 from radman.data.models import db
@@ -76,6 +76,4 @@ def home(lang_code=None):
     return render_template('index.htm')
 
 app.register_blueprint(main, url_prefix='/main')
-app.register_blueprint(main, url_prefix='/<lang_code>/main')
-app.register_blueprint(admin, url_prefix='/admin')
-app.register_blueprint(admin, url_prefix='/<lang_code>/admin')
+app.register_blueprint(api_bp, url_prefix='/api')
