@@ -1,33 +1,110 @@
 {% extends 'layout.htm' %}
 {% block container %}
-  <div class="top-pad">
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>{{ _('iuid') }}</th>
-          <th>{{ _('datetime') }}</th>
-          <th>{{ _('description') }}</th>
-          <th>{{ _('accession_number') }}</th>
-          <th>{{ _('study_id') }}</th>
-          <th>{{ _('patient_id') }}</th>
-          <th>{{ _('patient_name') }}</th>
-          <th>{{ _('referring_physician') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-{% for study in studies %}
-        <tr>
-            <td>{{study.iuid}}</td>
-            <td>{{study.datetime}}</td>
-            <td>{{study.description}}</td>
-            <td>{{study.accession_number}}</td>
-            <td>{{study.study_id}}</td>
-            <td>{{study.patient_id}}</td>
-            <td>{{study.patient_name}}</td>
-            <td>{{study.referring_physician}}</td>
-        </tr>
-{% endfor %}
-      </tbody>
-    </table>
-  </div>
+    <div class="top-pad">
+        <table id="datatable" class="table table-bordered dataTable no-footer" width="100%">
+            <thead>
+            <tr>
+                <th></th>
+                <th>Study ID</th>
+                <th>Accession</th>
+                <th>Study Date</th>
+                <th>Description</th>
+                <th>Patient Name</th>
+                <th>Patient ID</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+
+        function datachildFormat ( d ) {
+            return '<table id="datachild-'+String(d.id)+'" class="table dataTable no-footer" width="100%">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>Series</th>' +
+                    '<th>Description</th>' +
+                    '<th>Modality</th>' +
+                    '<th>Instance</th>' +
+                    '</tr>' +
+                    '</thead>' +
+                    '</table>';
+        }
+        $(document).ready(function() {
+            var table = $('#datatable').DataTable( {
+                ajax: {
+                    "url": "/api/v1/study",
+                    "dataSrc" : "objects"
+                },
+                columns: [
+                    {
+                        "orderable": false,
+                        "data": null,
+                        "defaultContent": '<i data-toggle class="fa fa-plus-square-o" ' +
+                        'style="cursor: pointer;"></i>'
+                    },
+                    { data: "id" },
+                    { data: "accession_number" },
+                    { data: "datetime" },
+                    { data: "description"},
+                    { data: "patient_name" },
+                    { data: "patient_id"}
+                ],
+                "order": [[1, "asc" ]]
+            } );
+
+            $('#datatable tbody').on('click', 'i[data-toggle]', function () {
+                var tr = $(this).closest('tr');
+                var row = table.row( tr );
+
+                if ( row.child.isShown() ) {
+                    $(this).addClass( 'fa-minus-square-o' ).addClass('fa-plus-square-o')
+                    row.child.hide();
+                    tr.removeClass('shown');
+                } else {
+                    $(this).removeClass( 'fa-plus-square-o' ).addClass('fa-minus-square-o')
+                    tr.addClass('shown');
+                    row.child( datachildFormat(row.data()) ).show();
+
+                    $('#datachild-'+String((row.data()).id)).DataTable( {
+                        ajax: {
+                            "url" : '/api/v1/study/'+String((row.data()).id) + '/series',
+                            "dataSrc" : function(json) {
+                                var temp, item, data = [];
+                                for (var i=0;i<json.objects.length;i++) {
+                                    series = json.objects[i];
+                                    instances = series.instances;
+                                    for (var instance in instances) {
+                                        item = {};
+                                        item['series_number'] = series.number;
+                                        item['series_description'] = series.description;
+                                        item['modality'] = series.modality;
+                                        item['instance_number'] = instances[instance].number
+                                        data.push(item);
+                                    }
+
+                                }
+                                return data
+                            }
+                        },
+                        columns: [
+                            { data: "series_number" },
+                            { data: "series_description" },
+                            { data: "modality" },
+                            { data: "instance_number" },
+                        ],
+                        "paging":   false,
+                        "info":     false,
+                        "filter":   false,
+                        "order": [[0, "asc" ]]
+                    } );
+
+                }
+            });
+        });
+    </script>
+
 {% endblock %}
