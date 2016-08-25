@@ -13,8 +13,9 @@ class Instance(db.Model):
     series = db.relationship('Series',
                              backref=db.backref('instances', lazy='joined'))
 
-    def __init__(self, sop_iuid, sop_ciuid, number):
+    def __init__(self, sop_iuid, series,sop_ciuid, number):
         self.sop_iuid = sop_iuid
+        self.series = series
         self.sop_ciuid = sop_ciuid
         self.number = number
 

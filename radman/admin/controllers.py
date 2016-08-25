@@ -36,6 +36,6 @@ def create_author():
 
             return redirect(url_for('admin.create_author'))
 
-        return redirect(url_for('main.display_authors'))
+        return redirect(url_for('archive.display_authors'))
 
     return render_template('create_author.htm', form=form)
