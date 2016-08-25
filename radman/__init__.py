@@ -1,13 +1,14 @@
-from flask import abort, Flask, g, render_template, request
+from flask import abort, Flask, g, render_template, request,session
 from flask_babel import Babel
 from flask_security import current_user
 from flask_security.decorators import login_required
 from radman.utils import get_instance_folder_path
 from radman.main.controllers import main
-from radman.api.controllers import api_bp
 from radman.cache import cache
 from radman.config import configure_app
-from radman.data.models import db
+from radman.data.models import Study,Series,Instance, db
+from flask.ext.restless import APIManager
+from flask.ext.restless import ProcessingException
 
 app = Flask(__name__,
             instance_path=get_instance_folder_path(),
@@ -76,4 +77,15 @@ def home(lang_code=None):
     return render_template('index.htm')
 
 app.register_blueprint(main, url_prefix='/main')
-app.register_blueprint(api_bp, url_prefix='/api')
+
+def api_auth_func(**kw):
+    if current_user.is_authenticated():
+        return True
+    else:
+        return False
+
+api_manager = APIManager(app,session=session,flask_sqlalchemy_db=db,
+                         preprocessors=dict(GET_SINGLE=[api_auth_func],GET_MANY=[api_auth_func]))
+api_manager.create_api(Study,url_prefix='/api/v1/',methods=["GET"])
+api_manager.create_api(Series,methods=["GET"])
+api_manager.create_api(Instance,methods=["GET"])

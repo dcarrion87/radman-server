@@ -10,13 +10,17 @@ def create_roles(data_store):
 
 
 def create_study_series_instance(db):
+
     study1 = Study('1111.2222.3333',datetime.datetime.now())
     series1 = Series('1111.2222.3333.4444',study1)
     instance1 = Instance('1111.2222.3333.4444.5555','1.2.3.4',1)
-
+    instance2 = Instance('1111.2222.3333.4444.5556', '1.2.3.4', 1)
+    instance3 = Instance('1111.2222.3333.4444.5557', '1.2.3.4', 1)
     db.session.add(study1)
     db.session.add(series1)
     db.session.add(instance1)
+    db.session.add(instance2)
+    db.session.add(instance3)
     db.session.commit()
 
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="3688746975">
+  <component name="DataSourceManagerImpl" format="xml" hash="815603497">
     <data-source source="LOCAL" name="Sqlite (Xerial) - radman.sqlite" uuid="cd76f93e-1926-49e0-bd40-aa61c886ce02">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>

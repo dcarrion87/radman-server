@@ -9,27 +9,18 @@ api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
 
 
-class Studies(Resource):
+class StudiesResource(Resource):
+    @login_required
+    def get(self):
+        return {
+            'hello': 'studies'
+            }
+class StudiesListResource(Resource):
     @login_required
     def get(self):
         return {
             'hello': 'studies'
             }
 
-class Series(Resource):
-    @login_required
-    def get(self):
-        return {
-            'hello': 'series'
-            }
-
-class Instance(Resource):
-    @login_required
-    def get(self):
-        return {
-            'hello': 'instance'
-            }
 
 api.add_resource(Studies, '/studies')
-api.add_resource(Series, '/series')
-api.add_resource(Instance, '/instance')
