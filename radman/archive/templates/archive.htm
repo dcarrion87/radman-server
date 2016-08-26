@@ -1,6 +1,5 @@
 {% extends 'layout.htm' %}
 {% block container %}
-    <div class="top-pad">
         <table id="datatable" class="table table-bordered dataTable no-footer" width="100%">
             <thead>
             <tr>
@@ -14,13 +13,11 @@
             </tr>
             </thead>
         </table>
-    </div>
 {% endblock %}
 
 {% block scripts %}
 
     <script>
-
         function datachildFormat ( d ) {
             return '<table id="datachild-'+String(d.id)+'" class="table dataTable no-footer" width="100%">' +
                     '<thead>' +
