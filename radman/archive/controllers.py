@@ -13,13 +13,9 @@ def display_archive():
     if request.args.get('date_range'):
         date_from = request.args.get('date_range').split(" to ")[0]
         date_to = request.args.get('date_range').split(" to ")[1]
-        print(date_from)
-        print(date_to)
     else:
         date_from = (datetime.datetime.now() + datetime.timedelta(-30)).strftime("%Y-%m-%d")
         date_to = datetime.datetime.now().strftime("%Y-%m-%d")
-        print(date_from)
-        print(date_to)
 
     return render_template("archive.htm",accession_number = request.args.get('accession_number'),
                            patient_name = request.args.get('patient_name'),
