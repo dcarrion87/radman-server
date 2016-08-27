@@ -10,12 +10,12 @@ def create_roles(data_store):
 
 
 def create_study_series_instance(db):
-    study1 = Study('1.2.1',datetime.datetime.now())
-    study2 = Study('1.2.2', datetime.datetime.now())
-    study3 = Study('1.2.3', datetime.datetime.now())
-    series1 = Series('1.2.3.1',study1,description="Epic Heart Time",number=1)
-    series2 = Series('1.2.3.2',study1,description="Epic Report",number=2)
-    series3 = Series('1.2.3.3',study3,description="Epic Heart Time",number=1)
+    study1 = Study('1.2.1',datetime.datetime.now(),accession_number="3412341",description="Heart",patient_id="145134",patient_name="George")
+    study2 = Study('1.2.2',datetime.datetime.now(),accession_number="8534563",description="Head",patient_id="542341",patient_name="Fred")
+    study3 = Study('1.2.3',datetime.datetime.now(),accession_number="1434523",description="Knee",patient_id="752243",patient_name="Daniel")
+    series1 = Series('1.2.3.1',study1,description="Epic Heart Time",station_name="Epic Station",number=1,modality="XA")
+    series2 = Series('1.2.3.2',study1,description="Epic Report",station_name="Epic Station",number=2,modality="SR")
+    series3 = Series('1.2.3.3',study3,description="Epic Heart Time",station_name="Not So Station",number=1,modality="XA")
     instance1 = Instance('1.2.3.4.1',series1,'1.2.3.4',number=1)
     instance2 = Instance('1.2.3.4.2',series1,'1.2.3.4',number=2)
     instance3 = Instance('1.2.3.4.3',series1,'1.2.3.4',number=3)

@@ -1,18 +1,81 @@
 {% extends 'layout.htm' %}
 {% block container %}
-        <table id="datatable" class="table table-bordered dataTable no-footer" width="100%">
-            <thead>
-            <tr>
-                <th></th>
-                <th>Study ID</th>
-                <th>Accession</th>
-                <th>Study Date</th>
-                <th>Description</th>
-                <th>Patient Name</th>
-                <th>Patient ID</th>
-            </tr>
-            </thead>
-        </table>
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Archive</h3>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_title">
+                    <h2>Filter</h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                        <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li><a class="close-link"><i class="fa fa-close"></i></a>
+                        </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                    <form action="" method=get>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <input type="text" name="accession_number" id="accession_number" placeholder="Accession" class="form-control" value="{{ accession_number|default('', true) }}">
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <input type="text" name="patient_name" id="patient_name" placeholder="Patient" class="form-control" value="{{ patient_name|default('',true) }}">
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <input type="text" name="patient_id" id="patient_id" placeholder="Patient ID" class="form-control" value="{{ patient_id|default('',true) }}">
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <input type="text" name="station_name" id="station_name" placeholder="Station Name" class="form-control" value="{{ station_name|default('',true) }}">
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <input type="text" name="description" id="description" placeholder="Study Description" class="form-control" value="{{ description|default('',true) }}">
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group ">
+                            <div class="input-prepend input-group">
+                                <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                                <input type="text" name="date_range" id="date_range" class="form-control" value="{{ date_from }} - {{ date_to }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12 col-xs-12 form-group">
+                            <button type="button" onclick='resetClick()' class="btn btn-primary">Reset</button>
+                            <button type="submit" class="btn btn-success">Apply</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="x_panel">
+                <div class="x_content">
+                    <table id="datatable" class="table table-bordered dataTable no-footer" width="100%">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Study ID</th>
+                            <th>Accession</th>
+                            <th>Study Date</th>
+                            <th>Description</th>
+                            <th>Station Name</th>
+                            <th>Modalities</th>
+                            <th>Patient Name</th>
+                            <th>Patient ID</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}
@@ -30,10 +93,44 @@
                     '</thead>' +
                     '</table>';
         }
+        function resetClick() {
+		  window.location = "/archive";
+		}
         $(document).ready(function() {
+            $('#date_range').daterangepicker({
+                "locale": {
+                    "direction": "ltr",
+                    "format": "YYYY-MM-DD",
+                    "separator": " to "
+                },
+                "startDate": "{{ date_from }}",
+                "endDate": "{{ date_to }}"
+            });
             var table = $('#datatable').DataTable( {
                 ajax: {
                     "url": "/api/v1/study",
+                    "data": {"q": JSON.stringify({"filters": [
+                        {% if accession_number %}
+                            {"name": "accession_number", "op": "like", "val": "%{{ accession_number }}%"},
+                        {% endif %}
+                        {% if patient_name %}
+                            {"name": "patient_name", "op": "like", "val": "%{{ patient_name }}%"},
+                        {% endif %}
+                        {% if patient_id %}
+                            {"name": "patient_id", "op": "like", "val": "%{{ patient_id }}%"},
+                        {% endif %}
+                        {% if description %}
+                            {"name": "description", "op": "like", "val": "%{{ description }}%"},
+                        {% endif %}
+                        {% if station_name %}
+                            {"name": "series", "op": "any", "val": {
+                                "name" : "station_name", "op": "like", "val": "%{{ station_name }}%"
+                            }},
+                        {% endif %}
+                        {"name": "datetime", "op": "ge", "val": "{{ date_from }} 00:00:00"},
+                        {"name": "datetime", "op": "le", "val": "{{ date_to }} 23:59:59"}
+                    ]
+                    })},
                     "dataSrc" : "objects"
                 },
                 columns: [
@@ -47,6 +144,14 @@
                     { data: "accession_number" },
                     { data: "datetime" },
                     { data: "description"},
+                    { data: "series[,].station_name","render": function ( data, type, full, meta ) {
+                            return ($.unique(data.split(','))).join(',');
+                        }
+                    },
+                    { data: "series[,].modality","render": function ( data, type, full, meta ) {
+                            return ($.unique(data.split(','))).join(',');
+                        }
+                    },
                     { data: "patient_name" },
                     { data: "patient_id"}
                 ],
@@ -70,7 +175,7 @@
                         ajax: {
                             "url" : '/api/v1/study/'+String((row.data()).id) + '/series',
                             "dataSrc" : function(json) {
-                                var temp, item, data = [];
+                                var item, data = [];
                                 for (var i=0;i<json.objects.length;i++) {
                                     series = json.objects[i];
                                     instances = series.instances;
@@ -82,7 +187,6 @@
                                         item['instance_number'] = instances[instance].number
                                         data.push(item);
                                     }
-
                                 }
                                 return data
                             }
@@ -91,7 +195,7 @@
                             { data: "series_number" },
                             { data: "series_description" },
                             { data: "modality" },
-                            { data: "instance_number" },
+                            { data: "instance_number" }
                         ],
                         "paging":   false,
                         "info":     false,
